@@ -1,0 +1,1 @@
+## Example Project using Hexagonal/Onion Architecture

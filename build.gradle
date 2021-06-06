@@ -132,7 +132,7 @@ allprojects {
         violationRules {
             rule {
                 limit {
-                    minimum = 0.9
+                    minimum = 0.5
                 }
             }
         }
@@ -186,6 +186,7 @@ group 'com.sivaone'
 version '1.0-SNAPSHOT'
 
 dependencies {
+    testImplementation group: 'com.tngtech.archunit', name: 'archunit-junit5', version: '0.19.0'
     implementation(project(':app'))
     implementation(project(':api'))
     implementation(project(':domain'))

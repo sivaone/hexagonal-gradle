@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableJpaRepositories("com.sivaone.example.persistence.repository")
 @EnableTransactionManagement
 @PropertySource("application.properties")
+@SuppressWarnings({"PMD.BeanMembersShouldSerialize"})
 public class PersistenceTestConfig {
 
   @Autowired

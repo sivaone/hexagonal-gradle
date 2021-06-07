@@ -5,6 +5,9 @@ import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
 import com.tngtech.archunit.library.Architectures;
 
+/**
+ * Architecture tests.
+ */
 @AnalyzeClasses(packages = ArchitectureTest.BASE_PACKAGE)
 public class ArchitectureTest {
   public static final String BASE_PACKAGE = "com.sivaone.example";

@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
     classes = {PersistenceTestConfig.class},
     loader = AnnotationConfigContextLoader.class)
 @Transactional
+@SuppressWarnings({"PMD.BeanMembersShouldSerialize"})
 class CustomerOrdersTest {
 
   @Autowired

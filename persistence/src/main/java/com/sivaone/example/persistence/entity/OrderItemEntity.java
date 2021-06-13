@@ -18,10 +18,13 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name = "ORDER")
-public class OrderEntity {
+public class OrderItemEntity {
   @Id
   @GeneratedValue
   private Long id;
+
+  @ManyToOne
+  private CustomerOrderEntity orderId;
 
   @ManyToOne(optional = false, cascade = CascadeType.REFRESH)
   @JoinColumn(name = "id", insertable=false, updatable=false)
@@ -29,4 +32,8 @@ public class OrderEntity {
 
   @NotNull
   private Integer quantity;
+
+  @NotNull
+  private Double price;
+
 }

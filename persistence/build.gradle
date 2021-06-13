@@ -1,0 +1,16 @@
+
+dependencies {
+    implementation group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
+    implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
+    implementation group: "org.springframework.data", name: "spring-data-jpa", version: "$springDataJpaVersion"
+    implementation group: "org.springframework", name: "spring-context", version: "$springVersion"
+
+    implementation(project(":domain"))
+
+    testImplementation group: "org.springframework", name: "spring-test", version: "$springVersion"
+    testImplementation group: "com.h2database", name: "h2", version: "$h2Version"
+    testImplementation group: "org.hibernate", name: "hibernate-core", version: "$hibernateVersion"
+//    implementation group: "org.hibernate", name: "hibernate-entitymanager", version: "$hibernateVersion"
+//    implementation group: "org.hibernate.validator", name: "hibernate-validator", version: "$hibernateValidatorVersion"
+
+}

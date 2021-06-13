@@ -1,0 +1,28 @@
+pluginManagement {
+    plugins {
+        id "com.dorongold.task-tree" version "$taskTreePluginVersion"
+        id "com.github.ben-manes.versions" version "$versionsPluginVersion"
+        id "com.github.spotbugs" version "$spotbugsPluginVersion"
+        id "info.solidsoft.pitest" version "$pitestPluginVersion"
+        id "org.kordamp.gradle.jdeps" version "$jdepsPluginVersion"
+        id "org.owasp.dependencycheck" version "$dependencyCheckPluginVersion"
+        id "org.unbroken-dome.test-sets" version "$testSetsPluginVersion"
+        id "org.springframework.boot" version "$springBootVersion"
+        id "io.spring.dependency-management" version "$springDependencyManagementVersion"
+    }
+//    repositories {
+//
+//    }
+//    resolutionStrategy {
+//
+//    }
+}
+
+rootProject.name = 'hexagonal-gradle'
+include 'app'
+include 'api'
+include 'domain'
+include 'persistence'
+include 'usecase'
+include 'integration'
+

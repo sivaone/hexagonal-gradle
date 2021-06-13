@@ -1,0 +1,211 @@
+import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
+import com.github.spotbugs.snom.SpotBugsTask
+
+plugins {
+    id "build-dashboard"
+    id "project-report"
+    id "com.dorongold.task-tree"
+    id "com.github.ben-manes.versions"
+    id "java"
+    id "org.unbroken-dome.test-sets"
+    id "checkstyle"
+    id "pmd"
+    id "com.github.spotbugs"
+    id "jacoco"
+    id "info.solidsoft.pitest"
+//    id "org.kordamp.gradle.jdeps"
+//    id "org.owasp.dependencycheck"
+//    id "application"
+    id "org.springframework.boot" apply false
+    id "io.spring.dependency-management" apply false
+}
+
+allprojects {
+    apply plugin: "java"
+    apply plugin: "checkstyle"
+    apply plugin: "pmd"
+    apply plugin: "jacoco"
+    apply plugin: "com.github.spotbugs"
+    apply plugin: "build-dashboard"
+    apply plugin: "project-report"
+    apply plugin: "com.dorongold.task-tree"
+    apply plugin: "com.github.ben-manes.versions"
+    apply plugin: "org.unbroken-dome.test-sets"
+
+    dependencies {
+        compileOnly "org.projectlombok:lombok:$lombokVersion"
+        annotationProcessor "org.projectlombok:lombok:$lombokVersion"
+        compileOnly "com.github.spotbugs:spotbugs-annotations:$spotbugsVersion"
+        compileOnly "com.google.code.findbugs:findbugs-annotations:$findbugsAnnotationsVersion"
+
+        testCompileOnly "org.projectlombok:lombok:$lombokVersion"
+        testAnnotationProcessor "org.projectlombok:lombok:$lombokVersion"
+        testCompileOnly "com.google.code.findbugs:findbugs-annotations:$findbugsAnnotationsVersion"
+
+        testImplementation "org.junit.jupiter:junit-jupiter:$junitVersion"
+        testImplementation "org.junit.jupiter:junit-jupiter-params:$junitVersion"
+        testImplementation "org.assertj:assertj-core:$assertJVersion"
+        testImplementation "org.mockito:mockito-inline:$mockitoVersion"
+        testImplementation "com.github.stefanbirkner:system-lambda:$systemLambdaVersion"
+
+        spotbugsPlugins "com.h3xstream.findsecbugs:findsecbugs-plugin:$findsecbugsPluginVersion"
+    }
+
+    repositories {
+        mavenCentral()
+    }
+
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of("$jdkVersion"))
+        }
+    }
+
+    tasks.withType(JavaCompile) {
+        options.compilerArgs += ["-Werror", "-Xlint:all,-processing", "-parameters"]
+    }
+
+    test {
+        // NB -- JaCoCo draws from _unit tests_, not integration tests
+        // When tests fail, you still have a coverage report
+        finalizedBy jacocoTestReport
+    }
+
+    tasks.withType(Test) {
+        // Quieter builds when JUL is in use (you or another library or tool)
+        // TODO: Keep builds noisy in CI
+        systemProperty "java.util.logging.config.file",
+                "$projectDir/config/logging.properties"
+    }
+
+    testSets {
+        integrationTest
+    }
+
+    tasks.withType(Test) {
+        // This idiom ensures JUnit5 for integration tests, not just unit tests
+        useJUnitPlatform()
+    }
+
+    checkstyle {
+        toolVersion = checkstyleVersion
+        // default checkstyle config
+//        configFile = project(':').file("config/checkstyle/checkstyle.xml")
+        // google style
+         configFile = project(':').file("config/checkstyle/google_checks.xml")
+        // sun style
+        // configFile = project(':').file("config/checkstyle/sun_checks.xml")
+    }
+
+    pmd {
+        ignoreFailures = false
+        // TODO: targetJdk = 11 -- there is no defined constant for this
+        toolVersion = pmdVersion
+    }
+
+    spotbugs {
+        ignoreFailures = true
+        effort = 'Max'
+        reportLevel = 'Low'
+        toolVersion = spotbugsVersion
+    }
+
+    tasks.withType(SpotBugsTask) {
+        reports {
+            html {
+                enabled = true
+            }
+            xml {
+                enabled = true
+            }
+        }
+    }
+
+    jacoco {
+        toolVersion = jacocoVersion
+    }
+
+    jacocoTestReport {
+        dependsOn test
+    }
+
+    jacocoTestCoverageVerification {
+        violationRules {
+            rule {
+                limit {
+                    minimum = 0.3
+                }
+            }
+        }
+    }
+
+//    pitest {
+//        // TODO: Teach pitest to ignore Lombok code
+//        coverageThreshold = 75
+//        junit5PluginVersion = pitestJUnit5PluginVersion
+//        mutationThreshold = 100
+//        timestampedReports = false
+//        verbose = true
+//    }
+
+//    tasks.named("pitest") { // PITest plugin does not expose task as expected
+//        dependsOn jacocoTestCoverageVerification
+//    }
+
+//    jdepsReport {
+//        // TODO: Report shows a big mess with dependencies
+//        // TODO: Why mess with multi-release jars?
+//        multiReleaseJars = [".*": "$jdkVersion"]
+//    }
+
+//    dependencyCheck {
+//        failBuildOnCVSS = 0
+//    }
+
+//    jar {
+//        manifest {
+//            attributes 'Main-Class': "$mainClass"
+//            attributes 'Add-Opens': 'java.base/java.lang java.base/java.util java.base/java.lang.reflect'
+//        }
+//    }
+
+    check {
+        dependsOn += jacocoTestCoverageVerification
+//        dependsOn += "pitest"
+//        dependsOn += integrationTest
+//        dependsOn += dependencyCheckAnalyze
+    }
+
+    tasks.withType(DependencyUpdatesTask) {
+        rejectVersionIf {
+            !isStable(it.candidate.version) && isStable(it.currentVersion)
+        }
+    }
+}
+
+group 'com.sivaone'
+version '1.0-SNAPSHOT'
+
+dependencies {
+    testImplementation group: 'com.tngtech.archunit', name: 'archunit-junit5', version: '0.19.0'
+    implementation(project(':app'))
+    implementation(project(':api'))
+    implementation(project(':domain'))
+    implementation(project(':persistence'))
+    implementation(project(':usecase'))
+    implementation(project(':integration'))
+}
+
+wrapper {
+    gradleVersion = gradleWrapperVersion
+    distributionType = "ALL"
+}
+
+static def isStable(version) {
+    def stableKeyword = ["RELEASE", "FINAL", "GA"].any {
+        version.toUpperCase().contains(it)
+    }
+    def otherReleasePattern = version ==~ '^[0-9,.v-]+(-r)?$'
+
+    return stableKeyword || otherReleasePattern
+}

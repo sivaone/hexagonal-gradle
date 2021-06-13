@@ -98,7 +98,7 @@ allprojects {
     }
 
     pmd {
-        ignoreFailures = false
+        ignoreFailures = true
         // TODO: targetJdk = 11 -- there is no defined constant for this
         toolVersion = pmdVersion
     }

@@ -32,5 +32,24 @@ pipeline {
                 }
             }
         }
+
+        stage("Unit Test") {
+            steps {
+                withGradle {
+                    bat 'gradlew.bat test'
+                }
+            }
+        }
+
+        stage("Sonar Scan") {
+            environment {
+                SCANNER_HOME = tool 'SonarQubeScanner'
+            }
+            steps {
+                withSonarQubeEnv('SonarCloudOne') {
+                    bat '%SCANNER_HOME%/bin/sonar-scanner.bat'
+                }
+            }
+        }
     }
 }

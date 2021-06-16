@@ -16,6 +16,7 @@ plugins {
 //    id "org.kordamp.gradle.jdeps"
 //    id "org.owasp.dependencycheck"
 //    id "application"
+    id "org.sonarqube"
     id "org.springframework.boot" apply false
     id "io.spring.dependency-management" apply false
 }
@@ -31,6 +32,7 @@ allprojects {
     apply plugin: "com.dorongold.task-tree"
     apply plugin: "com.github.ben-manes.versions"
     apply plugin: "org.unbroken-dome.test-sets"
+    apply plugin: "org.sonarqube"
 
     dependencies {
         compileOnly "org.projectlombok:lombok:$lombokVersion"
@@ -90,7 +92,7 @@ allprojects {
     checkstyle {
         toolVersion = checkstyleVersion
         // default checkstyle config
-//        configFile = project(':').file("config/checkstyle/checkstyle.xml")
+        // configFile = project(':').file("config/checkstyle/checkstyle.xml")
         // google style
          configFile = project(':').file("config/checkstyle/google_checks.xml")
         // sun style
@@ -127,6 +129,7 @@ allprojects {
 
     jacocoTestReport {
         dependsOn test
+        reports.xml.enabled true
     }
 
     jacocoTestCoverageVerification {
@@ -136,6 +139,14 @@ allprojects {
                     minimum = 0.3
                 }
             }
+        }
+    }
+
+    sonarqube {
+        properties {
+            property "sonar.sourceEncoding", "UTF-8"
+            property "sonar.projectKey", "com.sivaone:hexagonal-gradle"
+            property "sonar.organization", "sivaone-github"
         }
     }
 
